@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Display from './Display';
 import Keypad from './Keypad';
 
@@ -65,9 +65,40 @@ function Calculator() {
     setWaitingForSecondOperand(false);
   };
 
+  const handleBackspace = () => {
+    if (display.length > 1) {
+      setDisplay(display.slice(0, -1));
+    } else {
+      setDisplay('0');
+    }
+  };
+
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
   };
+
+  // Keyboard event handling
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const { key } = event;
+      if (/^\d$/.test(key)) {
+        handleNumber(key);
+      } else if (key === '.') {
+        handleDecimal();
+      } else if (['+', '-', '*', '/'].includes(key)) {
+        handleOperator(key);
+      } else if (key === 'Enter' || key === '=') {
+        handleEqual();
+      } else if (key === 'Escape') {
+        handleClear();
+      } else if (key === 'Backspace') {
+        handleBackspace();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown); // Cleanup
+  }, [display, firstOperand, operator, waitingForSecondOperand]);
 
   return (
     <div className={`max-w-xs mx-auto p-6 rounded-3xl shadow-lg ${isDarkMode ? 'bg-gray-800 dark' : 'bg-white'}`}>

@@ -57,6 +57,14 @@ function CurrencyConverter() {
     setAmount('0');
   };
 
+  const handleBackspace = () => {
+    if (amount.length > 1) {
+      setAmount(amount.slice(0, -1));
+    } else {
+      setAmount('0');
+    }
+  };
+
   const swapCurrencies = () => {
     const temp = fromCurrency;
     setFromCurrency(toCurrency);
@@ -66,6 +74,25 @@ function CurrencyConverter() {
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
   };
+
+  // Keyboard event handling for currency converter
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const { key } = event;
+      if (/^\d$/.test(key)) {
+        handleNumber(key);
+      } else if (key === '.') {
+        handleDecimal();
+      } else if (key === 'Escape') {
+        handleClear();
+      } else if (key === 'Backspace') {
+        handleBackspace();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown); // Cleanup
+  }, [amount]);
 
   if (loading) return <div className="text-white">Loading currencies...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
